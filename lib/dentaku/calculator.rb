@@ -11,7 +11,6 @@ module Dentaku
 
     def initialize
       clear
-      Rules.refresh
     end
 
     def add_function(fn)
@@ -51,12 +50,14 @@ module Dentaku
       variables_in_resolve_order = DependencyResolver::find_resolve_order(
         expression_dependencies)
 
-      results = variables_in_resolve_order.each_with_object({}) do |var_name, r|
+      results = variables_in_resolve_order.inject({}) do |r, var_name|
         r[var_name] = evaluate!(expressions[var_name], r)
+        r
       end
 
-      expression_hash.each_with_object({}) do |(k, _), r|
+      expression_hash.inject({}) do |r, (k, _)|
         r[k] = results[k.to_s]
+        r
       end
     end
 
@@ -69,7 +70,7 @@ module Dentaku
 
       if value.nil?
         key_or_hash.each do |key, val|
-          @memory[key.downcase.to_s] = val
+          @memory[key.to_s.downcase] = val
         end
       else
         @memory[key_or_hash.to_s] = value

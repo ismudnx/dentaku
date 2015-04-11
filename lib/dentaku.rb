@@ -2,6 +2,9 @@ require "bigdecimal"
 require "dentaku/calculator"
 require "dentaku/version"
 
+
+Float::INFINITY = 1.0/0.0
+
 module Dentaku
   def self.evaluate(expression, data={})
     calculator.evaluate(expression, data)

@@ -2,12 +2,12 @@ require 'dentaku/token'
 
 module Dentaku
   class TokenMatcher
-    attr_reader :children, :categories, :values
+    attr_reader :children
 
     def initialize(categories=nil, values=nil, children=[])
       # store categories and values as hash to optimize key lookup, h/t @jan-mangs
-      @categories = [categories].compact.flatten.each_with_object({}) { |c,h| h[c] = 1 }
-      @values     = [values].compact.flatten.each_with_object({}) { |v,h| h[v] = 1 }
+      @categories = [categories].compact.flatten.inject({}) { |h,c| h[c] = 1 ; h}
+      @values     = [values].compact.flatten.inject({}) { |k,v| k[v] = 1 ; k}
       @children   = children.compact
       @invert     = false
 
@@ -37,7 +37,7 @@ module Dentaku
         matched_tokens << token_stream[matched_tokens.length + offset]
       end
 
-      if @range.cover?(matched_tokens.length)
+      if @range.include?(matched_tokens.length)
         matched = true
       end
 

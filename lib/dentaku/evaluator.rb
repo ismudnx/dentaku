@@ -24,8 +24,7 @@ module Dentaku
 
     def match_rule_pattern(tokens)
       matched = false
-
-      Rules.filter(tokens).each do |pattern, evaluator|
+      Rules.each do |pattern, evaluator|
         pos, match = find_rule_match(pattern, tokens)
 
         if pos
@@ -81,7 +80,8 @@ module Dentaku
     end
 
     def extract_arguments_from_function_call(tokens)
-      _function_name, _open, *args_and_commas, _close = tokens
+      _close = tokens.pop
+      _function_name, _open, *args_and_commas = tokens
       args_and_commas.reject { |token| token.is?(:grouping) }
     end
 
@@ -99,11 +99,11 @@ module Dentaku
       Token.new(token.category, token.value * -1)
     end
 
-    def pow_negate(base, _, _, exp)
+    def pow_negate(base, _, __, exp)
       Token.new(base.category, base.value ** (exp.value * -1))
     end
 
-    def mul_negate(val1, _, _, val2)
+    def mul_negate(val1, _, __, val2)
       Token.new(val1.category, val1.value * val2.value * -1)
     end
 
@@ -126,22 +126,37 @@ module Dentaku
     end
 
     def round(*args)
-      _, _, *tokens, _ = args
+      _ = args.pop
+      _, _, *tokens = args
 
-      input_tokens, places_tokens = tokens.chunk { |t| t.category == :grouping }.
-                                          reject { |flag, tokens| flag }.
-                                             map { |flag, tokens| tokens }
+      temp = []
+      chunk = []
+
+      tokens.each do |t|
+        if t.category == :grouping
+          temp << chunk
+          chunk = []
+        else
+          chunk << t
+        end
+      end
+      temp << chunk
+
+      input_tokens, places_tokens = temp.reject{|ar| ar.empty?}
 
       input_value  = evaluate_token_stream(input_tokens).value
       places       = places_tokens ? evaluate_token_stream(places_tokens).value : 0
 
-      value = input_value.round(places)
+      # round function. tested for positive values and places
+      to_ceil = (input_value*(10**places))
+      value = (to_ceil - to_ceil.to_i) >= 0.5 ? (to_ceil.ceil)/(10.0**places) : (to_ceil.to_i)/(10.0**places)
 
       Token.new(:numeric, value)
     end
 
     def round_int(*args)
-      function, _, *tokens, _ = args
+      _ = args.pop
+      function, _, *tokens = args
 
       value = evaluate_token_stream(tokens).value
       rounded = if function.value == :roundup

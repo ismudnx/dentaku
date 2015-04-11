@@ -10,7 +10,7 @@ task :spec do
 end
 
 desc "Default: run specs."
-task default: :spec
+task :default=> :spec
 
 task :console do
   begin

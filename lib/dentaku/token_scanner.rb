@@ -54,18 +54,18 @@ module Dentaku
       end
 
       def operator
-        names = { pow: '^', add: '+', subtract: '-', multiply: '*', divide: '/', mod: '%' }.invert
+        names = { :pow=> '^', :add=> '+', :subtract=> '-', :multiply=> '*', :divide=> '/', :mod=> '%' }.invert
         new(:operator, '\^|\+|-|\*|\/|%', lambda { |raw| names[raw] })
       end
 
       def grouping
-        names = { open: '(', close: ')', comma: ',' }.invert
+        names = { :open=> '(', :close=> ')', :comma=> ',' }.invert
         new(:grouping, '\(|\)|,', lambda { |raw| names[raw] })
       end
 
       def comparator
-        names = { le: '<=', ge: '>=', ne: '!=', lt: '<', gt: '>', eq: '=' }.invert
-        alternate = { ne: '<>', eq: '==' }.invert
+        names = { :le=> '<=', :ge=> '>=', :ne=> '!=', :lt=> '<', :gt=> '>', :eq=> '=' }.invert
+        alternate = { :ne=> '<>', :eq=> '==' }.invert
         new(:comparator, '<=|>=|!=|<>|<|>|==|=', lambda { |raw| names[raw] || alternate[raw] })
       end
 

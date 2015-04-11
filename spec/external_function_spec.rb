@@ -8,27 +8,27 @@ describe Dentaku::Calculator do
       let(:with_external_funcs) do
         c = described_class.new
 
-        now = { name: :now, type: :string, signature: [], body: -> { Time.now.to_s } }
+        now = { :name=> :now, :type=> :string, :signature=> [], :body=> proc{ Time.now.to_s } }
         c.add_function(now)
 
         fns = [
           {
-            name:      :exp,
-            type:      :numeric,
-            signature: [ :numeric, :numeric ],
-            body:      ->(mantissa, exponent) { mantissa ** exponent }
+            :name=>      :exp,
+            :type=>      :numeric,
+            :signature=> [ :numeric, :numeric ],
+            :body=>      proc {|mantissa, exponent|  mantissa ** exponent }
           },
           {
-            name:      :max,
-            type:      :numeric,
-            signature: [ :arguments ],
-            body:      ->(*args) { args.max }
+            :name=>      :max,
+            :type=>      :numeric,
+            :signature=> [ :arguments ],
+            :body=>      proc {|*args|  args.max }
           },
           {
-            name:      :min,
-            type:      :numeric,
-            signature: [ :arguments ],
-            body:      ->(*args) { args.min }
+            :name=>      :min,
+            :type=>      :numeric,
+            :signature=> [ :arguments ],
+            :body=>      proc {|*args|  args.min }
           }
         ]
 
@@ -44,7 +44,7 @@ describe Dentaku::Calculator do
       it 'includes EXP' do
         expect(with_external_funcs.evaluate('EXP(2,3)')).to eq(8)
         expect(with_external_funcs.evaluate('EXP(3,2)')).to eq(9)
-        expect(with_external_funcs.evaluate('EXP(mantissa,exponent)', mantissa: 2, exponent: 4)).to eq(16)
+        expect(with_external_funcs.evaluate('EXP(mantissa,exponent)', :mantissa=> 2, :exponent=> 4)).to eq(16)
       end
 
       it 'includes MAX' do

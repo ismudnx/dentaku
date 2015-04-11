@@ -5,6 +5,6 @@ class ExternalFunction < Struct.new(:name, :type, :signature, :body)
   end
 
   def tokens
-    signature.flat_map { |t| [t, :comma] }[0...-1]
+    signature.map { |t| [t, :comma] }.flatten[0...-1]
   end
 end

@@ -17,7 +17,7 @@ describe Dentaku::Expression do
 
     describe 'with values set for all variables' do
       it 'is fully bound' do
-        dynamic = described_class.new('a > 5', {a: 7})
+        dynamic = described_class.new('a > 5', {:a=> 7})
         expect(dynamic).not_to be_unbound
       end
     end
